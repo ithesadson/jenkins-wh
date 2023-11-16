@@ -5,26 +5,25 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Jenkins işlem alanına geçmeden önce depoyu kontrol et
-                git 'https://github.com/your/helm/chart/repository.git'
+                git 'https://github.com/ithesadson/jenkins-wh.git'
             }
         }
         
-        stage('Build Helm Chart') {
+        stage('Build and Push Helm Chart') {
             steps {
-                // Helm Chart'ını oluştur
                 script {
-                    sh 'helm package ./path/to/your/chart'
+                    def chartName = "tempchart"
+
+                    sh "helm create $chartName"
+                    sh "helm package $chartName"
+
+                    // Send chart to harbor
+                    sh "curl --data-binary \"@${chartName}-0.1.0.tgz\" http://localhost:8081/api/charts"
+                    echo "Chart Pushed, Listed Charts:"
+                    sh "curl -X GET http://localhost:8081/api/charts"
                 }
             }
         }
 
-        stage('Deploy Helm Chart') {
-            steps {
-                // Helm Chart'ını Kubernetes kümesine yükle
-                script {
-                    sh 'helm upgrade --install release-name ./your-chart-name-0.1.0.tgz'
-                }
-            }
-        }
     }
 }
