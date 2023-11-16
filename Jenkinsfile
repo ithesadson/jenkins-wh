@@ -8,7 +8,7 @@ pipeline {
                 git 'https://github.com/ithesadson/jenkins-wh.git'
             }
         }
-        
+
         stage('Build and Push Helm Chart') {
             steps {
                 script {
